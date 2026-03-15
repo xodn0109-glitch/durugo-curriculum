@@ -992,3 +992,13 @@ h1 span {
     pointer-events: none;
     mix-blend-mode: multiply;
 }
+
+.footer {
+    text-align: center;
+    padding: 30px 0;
+    border-top: 1px solid var(--border-glass);
+    color: var(--text-main);
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-top: 40px;
+}
