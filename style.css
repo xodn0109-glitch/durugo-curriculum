@@ -271,7 +271,7 @@ body {
 }
 
 .school-logo {
-    height: 48px; /* Bigger logo */
+    height: 56px; /* Bigger logo */
     width: auto;
     filter: drop-shadow(0 2px 5px rgba(0,0,0,0.3));
 }
@@ -286,14 +286,14 @@ body {
     display: flex;
     justify-content: space-between;
     width: 100%;
-    font-size: 1.15rem;
+    font-size: 1.25rem;
     font-weight: 800;
     color: var(--text-main);
     line-height: 1.2;
 }
 
 .logo-subtitle {
-    font-size: 0.72rem;
+    font-size: 0.8rem;
     font-weight: 700;
     color: var(--text-muted);
     letter-spacing: 0.3px;
