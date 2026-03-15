@@ -32,114 +32,131 @@ document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
 
     // ---- CORE LOGIC ----
+    // Helper Promise for Papa.parse
+    function parseCSV(url) {
+        return new Promise((resolve, reject) => {
+            Papa.parse(url, {
+                download: true,
+                header: false,
+                complete: function(results) { resolve(results.data); },
+                error: reject
+            });
+        });
+    }
+
+    // Global Commentary Cache
+    window.subjectDetailsDB = {};
+
+    function processComments(rawData) {
+        window.subjectDetailsDB = {}; // Reset
+        for (let i = 1; i < rawData.length; i++) {
+            const row = rawData[i];
+            if (!row || row.length < 2) continue;
+            const name = row[1].trim();
+            if (name) {
+                window.subjectDetailsDB[name] = {
+                    overview: row[2] ? row[2].trim() : "",
+                    teacher: row[3] ? row[3].trim() : ""
+                };
+            }
+        }
+        console.log("Processed comments DB:", window.subjectDetailsDB);
+    }
+
     function fetchData(year) {
         const csvUrl = CSV_URLS[year];
+        const commentsUrl = typeof COMMENTS_URL !== 'undefined' ? COMMENTS_URL : '';
+
         if (!csvUrl) {
             console.error("Unknown year:", year);
             return;
         }
         
-        // Reset UI state for re-loading
         loader.classList.remove('hidden');
         guideSection.classList.add('hidden');
         curriculumSection.classList.add('hidden');
         subjectsContainer.innerHTML = '';
         
-        Papa.parse(csvUrl, {
-            download: true,
-            header: false, // The sheet has a complex header, we'll parse it manually by index
-            complete: function(results) {
-                processData(results.data);
-            },
-            error: function(err) {
-                console.error("Error parsing CSV:", err);
-                loader.innerHTML = `<p style="color:red"><i class="ph ph-warning"></i> 데이터를 불러오는데 실패했습니다.</p>`;
+        const promises = [parseCSV(csvUrl)];
+        if (commentsUrl && commentsUrl.trim() !== '') {
+            promises.push(parseCSV(commentsUrl));
+        }
+
+        Promise.all(promises).then(([curriculumData, commentsData]) => {
+            if (commentsData) {
+                processComments(commentsData);
             }
+            processData(curriculumData, year);
+        }).catch(err => {
+            console.error("Error loading CSV datasets:", err);
+            loader.innerHTML = `<p style="color:red"><i class="ph ph-warning"></i> 데이터를 불러오는데 실패했습니다.</p>`;
         });
     }
 
-    function processData(rawData) {
-        // Data format analysis based on the provided CSV screenshot/text:
-        // Rows 0 to 9 are complex headers.
-        // Data starts roughly at row 10 in 0-indexed array.
-        // Column indices:
-        // 0: 교과군 (Subject Group) e.g., 국어
-        // 1: 과목명 (Subject Name) e.g., 공통국어1
+    function processData(rawData, selectedYear) {
+        // Data format analysis based on the integrated CSV structure:
+        // Col 0: 입학년도
+        // Col 1: 교과군
+        // Col 2: 과목명
         // ...
-        // 11: 1학년 1학기 (Credit/Type)
-        // 12: 1학년 2학기
-        // 13: 2학년 1학기
-        // 14: 2학년 2학기
-        // 15: 3학년 1학기
-        // 16: 3학년 2학기
+        // Col 13: 1학년 1학기
+        // Col 14: 1학년 2학기
 
         const processed = [];
         let currentSubjectGroup = "";
-        let currentGradeSelectSemester = null; // Track semester for grade-selected groups
-        let currentGradeSelectRule = ""; // Track selection rule for grade-selected groups
-        let currentGradeSelectGroupId = ""; // New: Group ID for selections
-        let gradeSelectGroupCounter = 0; // New: Increment counter on new rule block
+        let currentGradeSelectSemester = null;
+        let currentGradeSelectRule = "";
+        let currentGradeSelectGroupId = "";
+        let gradeSelectGroupCounter = 0;
 
-        // Iterate starting from row 10 (data rows)
-        for (let i = 7; i < rawData.length; i++) {
+        for (let i = 1; i < rawData.length; i++) {
             const row = rawData[i];
-            
-            // Stop parsing if we hit the summary rows at the bottom or extracurricular activities
-            if (!row[1] || row[1].trim() === "" || 
-                row[1] === "자율・자치 활동" || 
-                row[1] === "동아리 활동" || 
-                row[1] === "진로 활동" ||
-                (row[0] && row[0].includes("창의적\n 체험활동"))) {
-                if(i > 120) continue; // Skip totals/summary rows
-                continue; // Skip extracurricular activities entirely
+            if (!row || row.length < 3) continue;
+
+            const rowYear = row[0] ? row[0].trim() : "";
+            if (rowYear !== String(selectedYear)) continue; // Filter by selected year
+
+            if (!row[2] || row[2].trim() === "" || 
+                row[2] === "자율・자치 활동" || 
+                row[2] === "동아리 활동" || 
+                row[2] === "진로 활동" ||
+                (row[1] && row[1].includes("창의적\n 체험활동"))) {
+                continue; 
             }
 
-            // Keep track of merged cells for Subject Group
-            if (row[0] && row[0].trim() !== "") {
-                let group = row[0].trim().replace(/\n/g, "");
+            if (row[1] && row[1].trim() !== "") {
+                let group = row[1].trim().replace(/\n/g, "");
                 if (group.includes("사회(역사/도덕 포함)")) {
                     group = "사회";
                 }
                 currentSubjectGroup = group;
             }
 
-            const subjectName = row[1] ? row[1].trim() : "";
-            if (!subjectName) continue; // Skip empty rows
+            const subjectName = row[2] ? row[2].trim() : "";
+            if (!subjectName) continue;
 
-            // Extract Type (Common, Selective, etc)
             let type = "일반";
-            if (row[4] === "○") type = "공통";
-            else if (row[5] === "○") type = "일반선택";
-            else if (row[6] === "○") type = "진로선택";
-            else if (row[7] === "○") type = "융합선택";
+            if (row[5] === "○") type = "공통";
+            else if (row[6] === "○") type = "일반선택";
+            else if (row[7] === "○") type = "진로선택";
+            else if (row[8] === "○") type = "융합선택";
             
-            // Selection Rule (e.g. 택1, 택4(3)) -> col 9 (1학기) or col 10 (2학기)
             let rule = "";
-            if (row[9] && row[9].trim() !== "") rule = row[9].trim();
-            else if (row[10] && row[10].trim() !== "") rule = row[10].trim();
+            if (row[10] && row[10].trim() !== "") rule = row[10].trim();
+            else if (row[11] && row[11].trim() !== "") rule = row[11].trim();
 
-            // Semester column mapping (based on actual CSV structure after checking raw data)
-            // 1학년 1학기: col 12 (13th column)
-            // 1학년 2학기: col 13
-            // 2학년 1학기: col 14
-            // 2학년 2학기: col 15
-            // 3학년 1학기: col 16
-            // 3학년 2학기: col 17
             const semesters = [
-                { grade: 1, term: 1, col: 12 },
-                { grade: 1, term: 2, col: 13 },
-                { grade: 2, term: 1, col: 14 },
-                { grade: 2, term: 2, col: 15 },
-                { grade: 3, term: 1, col: 16 },
-                { grade: 3, term: 2, col: 17 }
+                { grade: 1, term: 1, col: 13 },
+                { grade: 1, term: 2, col: 14 },
+                { grade: 2, term: 1, col: 15 },
+                { grade: 2, term: 2, col: 16 },
+                { grade: 3, term: 1, col: 17 },
+                { grade: 3, term: 2, col: 18 }
             ];
 
-            const isGradeSelect = row[3] === "○"; // 학년선택 과목
+            const isGradeSelect = row[4] === "○"; 
 
             if (isGradeSelect) {
-                // Grade-selected subjects: Google Sheet uses merged cells.
-                // Only the first subject in a group has semester data (as group total).
-                // Subsequent subjects inherit the semester.
                 let foundSemester = null;
                 semesters.forEach(sem => {
                     const cellValue = row[sem.col] ? row[sem.col].trim() : "";
@@ -157,8 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     currentGradeSelectGroupId = `group_id_${gradeSelectGroupCounter}`;
                 }
 
-                // Individual credit from col 18 (편성)
-                const individualCredit = row[18] ? row[18].trim().replace(/[^0-9]/g, '') : "";
+                const individualCredit = row[19] ? row[19].trim().replace(/[^0-9]/g, '') : "";
 
                 if (currentGradeSelectSemester && individualCredit) {
                     processed.push({
@@ -166,7 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         name: subjectName,
                         type: type,
                         rule: currentGradeSelectRule || "선택",
-                        groupId: currentGradeSelectGroupId, // Added
+                        groupId: currentGradeSelectGroupId,
                         credit: individualCredit,
                         grade: currentGradeSelectSemester.grade,
                         term: currentGradeSelectSemester.term,
@@ -174,7 +190,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 }
             } else {
-                // School-designated subjects: use semester columns directly
                 semesters.forEach(sem => {
                     const cellValue = row[sem.col] ? row[sem.col].trim() : "";
                     if (cellValue !== "") {
@@ -356,13 +371,19 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('modal-credits').innerText = subjectInfo.credit ? `${subjectInfo.credit} 단위(학점)` : '정보 없음';
         document.getElementById('modal-type').innerText = subjectInfo.type + (subjectInfo.rule !== '필수이수' ? ` (${subjectInfo.rule})` : '');
         
-        // FUTURE: Fetch from secondary JSON/Sheet for teacher comments
-        document.getElementById('modal-teacher-comment').innerHTML = `
-            ${subjectInfo.name} 과목에 대한 담당 선생님의 코멘트가 보여질 영역입니다.<br>
-            <span style="color:var(--text-muted); font-size:0.85em;">(현재 연동 대기 중 - 별도 배포되는 교사 입력 시트에서 가져올 예정)</span>
-        `;
-        
-        document.getElementById('modal-official-desc').innerText = `2022 개정 교육과정 ${subjectInfo.category} 교과(군)에 해당하는 과목입니다.`;
+        // Fetch description data from sub-sheet cache if it exists
+        const details = window.subjectDetailsDB ? window.subjectDetailsDB[subjectInfo.name] : null;
+        if (details) {
+            document.getElementById('modal-official-desc').innerText = details.overview || "과목 개요 정보가 없습니다.";
+            document.getElementById('modal-teacher-comment').innerText = details.teacher || "담당 교사 코멘트가 없습니다.";
+        } else {
+            // Fallback placeholder/defaults
+            document.getElementById('modal-teacher-comment').innerHTML = `
+                ${subjectInfo.name} 과목에 대한 담당 선생님의 코멘트가 보여질 영역입니다.<br>
+                <span style="color:var(--text-muted); font-size:0.85em;">(현재 연동 대기 중 - 별도 배포되는 교사 입력 시트에서 가져올 예정)</span>
+            `;
+            document.getElementById('modal-official-desc').innerText = `2022 개정 교육과정 ${subjectInfo.category} 교과(군)에 해당하는 과목입니다.`;
+        }
 
         modal.classList.add('active');
     };
