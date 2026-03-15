@@ -944,8 +944,12 @@ h1 span {
     }
 }
 
-/* Body Watermark Background */
-body::after {
+/* App Container Watermark Background */
+.app-container {
+    position: relative;
+}
+
+.app-container::after {
     content: '';
     position: fixed;
     top: 50%;
@@ -955,8 +959,8 @@ body::after {
     height: 100%;
     background: url('world-map.png') no-repeat center;
     background-size: cover;
-    opacity: 0.04; /* Extremely subtle */
-    z-index: -1;
+    opacity: 0.12; /* Increased for visibility */
+    z-index: -1; /* Behind text/cards, above body background */
     pointer-events: none;
     mix-blend-mode: multiply;
 }
