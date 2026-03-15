@@ -1,13 +1,16 @@
 :root {
-    --primary: #526eff;
-    --primary-light: #7a8eff;
-    --secondary: #ff527b;
-    --bg-dark: #0f111a;
-    --bg-card: rgba(255, 255, 255, 0.03);
-    --border-glass: rgba(255, 255, 255, 0.1);
-    --text-main: #f0f0f5;
-    --text-muted: #9aa0a6;
+    --primary: #3851ff; /* Slightly richer blue for light background */
+    --primary-light: #526eff;
+    --secondary: #ff3366; /* Vibrant warm pink */
+    --bg-dark: #f0f4f8; /* Soft light gray-blue background */
+    --bg-card: rgba(255, 255, 255, 0.85); /* Frosty white glass */
+    --border-glass: rgba(0, 0, 0, 0.05); /* Light frame border */
+    --text-main: #232a35; /* Dark text for contrast */
+    --text-muted: #5b6878; /* Subdued dark text */
     --font-family: 'Pretendard', sans-serif;
+    
+    --bg-surface: #ffffff; /* Modal/heavy card solids */
+    --shadow-soft: rgba(0, 0, 0, 0.05);
 }
 
 /* ==============================
@@ -75,9 +78,9 @@
 }
 
 .year-card {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    backdrop-filter: blur(20px);
+    background: var(--bg-card);
+    border: 1px solid var(--border-glass);
+    backdrop-filter: blur(25px);
     border-radius: 24px;
     padding: 40px 50px;
     cursor: pointer;
@@ -173,7 +176,7 @@
 }
 
 .notice-content {
-    color: #e0e6ff;
+    color: var(--text-main);
     line-height: 1.6;
     font-size: 0.95rem;
 }
@@ -189,8 +192,8 @@
     border-radius: 6px;
     font-size: 0.75rem;
     font-weight: 600;
-    background: rgba(255, 255, 255, 0.1);
-    color: #ccc;
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--text-muted);
 }
 
 .subj-rule.mandatory {
@@ -199,9 +202,9 @@
 }
 
 .subj-rule.crossover {
-    background: rgba(255, 171, 0, 0.15);
-    color: #ffd000;
-    border: 1px solid rgba(255, 171, 0, 0.3);
+    background: rgba(124, 58, 237, 0.08); /* Soft Violet */
+    color: #7c3aed; /* Deep Violet for high contrast */
+    border: 1px solid rgba(124, 58, 237, 0.2);
 }
 
 * {
@@ -225,7 +228,7 @@ body {
     border-radius: 50%;
     filter: blur(120px);
     z-index: -1;
-    opacity: 0.5;
+    opacity: 0.2;
 }
 
 .bg-shape-1 {
@@ -296,9 +299,10 @@ h1 {
 }
 
 h1 span {
-    background: linear-gradient(90deg, var(--primary), #a8b8ff);
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .hero-content p {
@@ -361,16 +365,16 @@ h1 span {
     position: absolute;
     width: 100px;
     height: 100px;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.2);
-    backdrop-filter: blur(15px);
+    background: var(--bg-card);
+    border: 1px solid var(--border-glass);
+    backdrop-filter: blur(20px);
     border-radius: 24px;
     display: flex;
     justify-content: center;
     align-items: center;
     font-size: 3rem;
-    color: white;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    color: var(--text-main);
+    box-shadow: 0 10px 30px var(--shadow-soft);
     animation: float 6s ease-in-out infinite;
 }
 
@@ -382,13 +386,13 @@ h1 span {
 .g-icon-stat {
     top: calc(50% - 40px);
     left: calc(50% - 70px);
-    width: 140px; /* Slightly wider for text */
+    width: 140px;
     height: auto;
     padding: 15px;
     flex-direction: column;
-    font-size: 1.5rem; /* Reset icon size in box */
+    font-size: 1.5rem;
     animation-delay: 3s;
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--bg-card);
 }
 
 @keyframes float {
@@ -505,8 +509,23 @@ h1 span {
 
 .grade {
     font-weight: 600;
-    color: #fff;
+    font-size: 0.82rem;
+    background: rgba(56, 81, 255, 0.08);
+    color: var(--primary);
+    padding: 3px 8px;
+    border-radius: 6px;
     margin-right: 8px;
+    display: inline-block;
+}
+
+.grade.warning-tag {
+    background: rgba(255, 51, 102, 0.08);
+    color: var(--secondary);
+}
+
+.grade.notice-tag {
+    background: rgba(0, 150, 255, 0.08);
+    color: #0077b6;
 }
 
 /* Tabs */
@@ -569,25 +588,25 @@ h1 span {
 
 /* Subject Rule Grouping styling */
 .rule-group {
-    margin-bottom: 60px; /* Increased separation */
-    background: #0d0f18; /* Solid dark background to contrast with main bg */
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 60px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-glass);
     border-radius: 24px;
     padding: 35px;
     position: relative;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5); /* Stronger shadow */
+    box-shadow: 0 10px 30px var(--shadow-soft);
 }
 
 .rule-group.elective {
-    border: 2px solid rgba(255, 82, 123, 0.3);
+    border: 2px solid rgba(255, 82, 123, 0.2);
     border-top: 6px solid var(--secondary);
-    background: linear-gradient(to bottom, rgba(255, 82, 123, 0.05) 0%, #0d0f18 100%);
+    background: linear-gradient(to bottom, rgba(255, 82, 123, 0.03) 0%, var(--bg-surface) 100%);
 }
 
 .rule-group.mandatory {
-    border: 2px solid rgba(82, 110, 255, 0.3);
+    border: 2px solid rgba(82, 110, 255, 0.2);
     border-top: 6px solid var(--primary);
-    background: linear-gradient(to bottom, rgba(82, 110, 255, 0.05) 0%, #0d0f18 100%);
+    background: linear-gradient(to bottom, rgba(82, 110, 255, 0.03) 0%, var(--bg-surface) 100%);
 }
 
 .rule-group:last-child {
@@ -602,20 +621,20 @@ h1 span {
     font-weight: 800;
     margin-bottom: 30px;
     padding-bottom: 15px;
-    border-bottom: 1px dashed rgba(255, 255, 255, 0.2);
+    border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
 }
 
 .rule-title.mandatory {
-    color: #a8b8ff;
+    color: var(--primary);
 }
 
 .rule-title.elective {
-    color: #ff8fa3;
+    color: var(--secondary);
 }
 
 .rule-title i {
     font-size: 1.8rem;
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(0, 0, 0, 0.04);
     padding: 10px;
     border-radius: 12px;
 }
@@ -662,8 +681,8 @@ h1 span {
     font-size: 0.75rem;
     padding: 3px 8px;
     border-radius: 8px;
-    background: rgba(255,255,255,0.1);
-    color: #ccc;
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--text-muted);
 }
 
 .subj-type {
@@ -675,7 +694,7 @@ h1 span {
     font-size: 1.2rem;
     font-weight: 700;
     margin-bottom: 10px;
-    color: white;
+    color: var(--text-main);
 }
 
 .card-bottom {
@@ -722,9 +741,9 @@ h1 span {
 }
 
 .modal-content {
-    background: #151822; /* solid dark background for readability */
-    border: 1px solid rgba(255,255,255,0.1);
-    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8);
+    background: var(--bg-surface);
+    border: 1px solid var(--border-glass);
+    box-shadow: 0 20px 40px var(--shadow-soft);
     width: 90%;
     max-width: 600px;
     border-radius: 24px;
@@ -848,5 +867,70 @@ h1 span {
     
     .tabs-container {
         flex-direction: column;
+    }
+}
+/* Floating Button */
+.floating-principal-btn {
+    display: inline-flex;
+    margin-top: 25px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-glass);
+    backdrop-filter: blur(15px);
+    padding: 12px 24px;
+    border-radius: 30px;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-main);
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 10px 30px var(--shadow-soft);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.floating-principal-btn:hover {
+    transform: translateY(-5px) scale(1.03);
+    border-color: var(--primary-light);
+    box-shadow: 0 15px 35px rgba(56, 81, 255, 0.15);
+}
+
+.floating-principal-btn i {
+    font-size: 1.4rem;
+    color: var(--primary);
+}
+
+/* Principal Modal Content */
+.principal-modal-icon {
+    font-size: 3.5rem;
+    color: var(--primary);
+    margin-bottom: 25px;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.principal-text {
+    font-size: 1.15rem;
+    line-height: 1.8;
+    color: var(--text-main);
+    font-style: italic;
+    text-align: center;
+    padding: 20px 30px;
+    position: relative;
+    font-weight: 500;
+}
+
+.principal-sign {
+    text-align: right;
+    margin-top: 25px;
+    font-weight: 700;
+    color: var(--text-muted);
+    font-size: 1rem;
+    padding-right: 20px;
+}
+
+@media (max-width: 768px) {
+    .floating-principal-btn {
+        margin-top: 15px;
+        padding: 10px 16px;
+        font-size: 0.9rem;
     }
 }

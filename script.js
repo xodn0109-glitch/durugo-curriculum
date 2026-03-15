@@ -208,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
             notice.innerHTML = `
                 <div class="notice-icon"><i class="ph ph-info"></i></div>
                 <div class="notice-content">
-                    <strong>안내 사항:</strong> 1학년의 [예술(음악/미술), 기술·가정/정보, 교양] 등 일부 필수 과목은 반별 교육과정 편성에 따라 1학기와 2학기에 교차로 이수하게 됩니다. (어느 학기에 이수하든 전체 이수 단위는 동일합니다.)
+                    <strong>안내 사항:</strong> 1학년의 [예술(음악/미술), 기술·가정/정보/제2외국어/교양] 등 일부 필수 과목은 반별 교육과정 편성에 따라 1학기와 2학기에 교차로 이수하게 됩니다. (어느 학기에 이수하든 전체 이수 단위는 동일합니다.)
                 </div>
             `;
             subjectsContainer.appendChild(notice);
@@ -358,5 +358,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function closeModal() {
         modal.classList.remove('active');
+    }
+});
+
+// Principal Message Modal Controller
+document.addEventListener('DOMContentLoaded', () => {
+    const trigger = document.getElementById('principal-trigger');
+    const modal = document.getElementById('principal-modal');
+    const closeBtn = document.getElementById('close-principal');
+
+    if (trigger && modal) {
+        trigger.addEventListener('click', () => {
+            modal.classList.add('active');
+        });
+
+        const closeModal = () => modal.classList.remove('active');
+        
+        if (closeBtn) closeBtn.addEventListener('click', closeModal);
+        
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
     }
 });
