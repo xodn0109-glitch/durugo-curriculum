@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>두루고등학교 교육과정 안내</title>
+    <meta name="description" content="2022 개정 교육과정 기반 두루고등학교 입학생을 위한 맞춤형 수강신청 가이드">
+    
+    <!-- Google Fonts: Pretendard for modern, clean typography -->
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- PapaParse for CSV parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    
+    <!-- Phosphor Icons for minimalist SVG icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Global Early Init Script -->
+    <script>
+        const CSV_URLS = {
+            2025: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQow_gZ1AI0kCVtU-HIUZsRDQv9V--MQJKWCaK2aipsxF-F6cUTe7CER3aJXKrvuGbDa2pJF2miV85f/pub?output=csv',
+            2026: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9UZxKapkv2JQup-h7x2jvotGyzbql0UgZ-zcr9-IvaZFeRFR148bw3f3wYZyYOndmk8noxakhLIz1/pub?output=csv'
+        };
+
+        function selectYear(year) {
+            console.log("selectYear called early for:", year);
+            // Hide year selection, show main app
+            const yearSel = document.getElementById('year-selection');
+            const appMain = document.getElementById('app-main');
+            
+            if (yearSel) yearSel.classList.add('hidden');
+            if (appMain) appMain.classList.remove('hidden');
+            
+            // Update dynamic year text
+            const heroYear = document.getElementById('hero-year');
+            if (heroYear) heroYear.textContent = year;
+            document.title = `${year}학년도 두루고등학교 교육과정 안내`;
+            
+            // Trigger data load
+            window._selectedYear = year;
+            window.dispatchEvent(new CustomEvent('yearSelected', { detail: year }));
+        }
+    </script>
+</head>
+<body>
+    <!-- Background Decorators for Glassmorphism Setup -->
+    <div class="bg-shape bg-shape-1"></div>
+    <div class="bg-shape bg-shape-2"></div>
+
+    <!-- Year Selection Landing Screen -->
+    <section id="year-selection" class="year-selection-screen">
+        <div class="year-selection-content">
+            <img src="logo.png" alt="두루고등학교 로고" class="year-sel-logo">
+            <h1 class="year-sel-title">두루고등학교<br><span>교육과정 안내</span></h1>
+            <p class="year-sel-subtitle">입학년도를 선택하세요</p>
+            <div class="year-cards">
+                <button class="year-card" data-year="2025" onclick="selectYear(2025)">
+                    <div class="year-card-badge">2025</div>
+                    <div class="year-card-label">학년도 입학생</div>
+                    <div class="year-card-desc">현재 2학년</div>
+                </button>
+                <button class="year-card" data-year="2026" onclick="selectYear(2026)">
+                    <div class="year-card-badge">2026</div>
+                    <div class="year-card-label">학년도 입학생</div>
+                    <div class="year-card-desc">현재 1학년</div>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <div class="app-container hidden" id="app-main">
+        <!-- Header Section -->
+        <header class="hero-section">
+            <div class="hero-content">
+                <div class="hero-top-badges fade-in">
+                    <img src="logo.png" alt="두루고등학교 로고" class="school-logo">
+                    <span class="badge">2022 개정 교육과정</span>
+                </div>
+                <h1 class="fade-in"><span id="hero-year">2026</span>학년도 입학생<br>맞춤형 <span>수강신청 가이드</span></h1>
+            </div>
+            <div class="hero-illustration">
+                <!-- Abstract 3D/Modern graphic placeholder or icon cluster -->
+                <div class="glass-icon-cluster">
+                    <div class="glass-icon g-icon-1"><i class="ph ph-flask"></i></div>
+                    <div class="glass-icon g-icon-2"><i class="ph ph-math-operations"></i></div>
+                    <div class="glass-icon g-icon-3"><i class="ph ph-globe-hemisphere-west"></i></div>
+                    <!-- Moved Stat Card Here -->
+                    <div class="glass-icon g-icon-stat stat-card">
+                        <i class="ph ph-graduation-cap"></i>
+                        <div class="stat-info">
+                            <span class="stat-label">졸업 필수</span>
+                            <span class="stat-value">192학점</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main id="main-content">
+            <!-- Loading State -->
+            <div class="loader-container" id="loader">
+                <div class="spinner"></div>
+                <p>교육과정 데이터를 불러오는 중...</p>
+            </div>
+
+            <!-- Graduation Track/Guide Section -->
+            <section class="section-container hidden" id="guide-section">
+                <div class="section-header">
+                    <h2><i class="ph ph-map-trifold"></i> 핵심 이수 경로</h2>
+                    <p>반드시 이수해야 하는 필수 영역의 로드맵입니다.</p>
+                </div>
+                
+                <div class="track-grid">
+                    <!-- Core Subjects Track -->
+                    <div class="track-card core-track">
+                        <div class="track-icon"><i class="ph ph-books"></i></div>
+                        <h3>기초 교과 (국·수·영)</h3>
+                        <div class="track-req">각 8학점 필수</div>
+                        <ul class="track-steps">
+                            <li><span class="grade">1학년</span> 공통 과목으로 대부분 충족</li>
+                            <li><span class="grade">주의</span> 자연스럽게 이수되나 최소 요건 확인 필수</li>
+                        </ul>
+                    </div>
+
+                    <!-- Inquiry Subjects Track -->
+                    <div class="track-card inquiry-track">
+                        <div class="track-icon"><i class="ph ph-microscope"></i></div>
+                        <h3>탐구 교과 (사회·과학)</h3>
+                        <div class="track-req">사회 14학점 / 과학 10학점 필수</div>
+                        <ul class="track-steps">
+                            <li><span class="grade">1학년</span> 한국사, 통합사회/과학으로 일부 충족</li>
+                            <li><span class="grade">🚨 주의</span> <b>사회탐구 또는 과학탐구로만 선택과목 이수 시 졸업 불가</b></li>
+                        </ul>
+                    </div>
+                    
+                    <!-- PE Track -->
+                    <div class="track-card pe-track">
+                        <div class="track-icon"><i class="ph ph-sneaker"></i></div>
+                        <h3>체육 교과</h3>
+                        <div class="track-req">필수 10학점</div>
+                        <ul class="track-steps">
+                            <li><span class="grade">1~2학년</span> 학기당 2학점 (총 8)</li>
+                            <li><span class="grade">3학년</span> 학기당 1학점 (총 2)</li>
+                            <li><span class="grade" style="background:rgba(255,255,255,0.2); color:#4cc9f0;">안내</span> 학교 교육과정대로 이수 시 자동 충족</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Arts Track -->
+                    <div class="track-card arts-track">
+                        <div class="track-icon"><i class="ph ph-palette"></i></div>
+                        <h3>예술 교과</h3>
+                        <div class="track-req">필수 10학점</div>
+                        <ul class="track-steps">
+                            <li><span class="grade">1학년</span> 음악/미술 학기 교차 (총 6)</li>
+                            <li><span class="grade">3학년</span> 음악/미술 중 택1 (총 4)</li>
+                            <li><span class="grade" style="background:rgba(255,255,255,0.2); color:#4cc9f0;">안내</span> 학교 교육과정대로 이수 시 자동 충족</li>
+                        </ul>
+                    </div>
+
+                    <!-- Tech/Lang/Hanja/LiberalArts Track -->
+                    <div class="track-card tech-track">
+                        <div class="track-icon"><i class="ph ph-translate"></i></div>
+                        <h3>생활·교양 교과 (기·가/정보/외국어)</h3>
+                        <div class="track-req">필수 16학점</div>
+                        <ul class="track-steps">
+                            <li><span class="grade">1학년</span> 기가/정보, 교양 교차</li>
+                            <li><span class="grade">2학년</span> 제2외국어/한문 택1</li>
+                            <li><span class="grade" style="background:rgba(255,255,255,0.2); color:#4cc9f0;">안내</span> 학교 교육과정대로 이수 시 자동 충족</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Interactive Subject Browser -->
+            <section class="section-container hidden" id="curriculum-section">
+                <div class="section-header">
+                    <h2><i class="ph ph-book-open-text"></i> 학년별 교과목 탐색</h2>
+                    <p>과목 카드를 클릭하여 <b>담당 교사의 상세 코멘트</b>와 선택 조건을 확인하세요.</p>
+                </div>
+
+                <!-- Tabs for Grades -->
+                <div class="tabs-container">
+                    <button class="tab-btn active" data-target="grade-1">1학년 (학기당 31학점)</button>
+                    <button class="tab-btn" data-target="grade-2">2학년 (학기당 29학점)</button>
+                    <button class="tab-btn" data-target="grade-3">3학년 (학기당 27학점)</button>
+                </div>
+
+                <!-- Content Area for Subjects -->
+                <div class="tab-content-area" id="subjects-container">
+                    <!-- Subject cards will be injected here by JS -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Subject Detail Modal (Glassmorphism) -->
+    <div class="modal-overlay" id="subject-modal">
+        <div class="modal-content">
+            <button class="modal-close" id="close-modal"><i class="ph ph-x"></i></button>
+            <div class="modal-header">
+                <span class="modal-badge" id="modal-category">국어</span>
+                <h2 id="modal-title">공통국어1</h2>
+            </div>
+            
+            <div class="modal-meta">
+                <div class="meta-item">
+                    <i class="ph ph-calendar-blank"></i>
+                    <span id="modal-semester">1학년 1학기</span>
+                </div>
+                <div class="meta-item">
+                    <i class="ph ph-star"></i>
+                    <span id="modal-credits">학점당 4단위</span>
+                </div>
+                <div class="meta-item">
+                    <i class="ph ph-check-circle"></i>
+                    <span id="modal-type">공통 (필수)</span>
+                </div>
+            </div>
+
+            <div class="modal-body">
+                <div class="teacher-comment-section">
+                    <h3><i class="ph ph-chalkboard-teacher"></i> 담당 교사 코멘트</h3>
+                    <div class="comment-box">
+                        <p id="modal-teacher-comment">선생님이 등록한 코멘트가 아직 없습니다. (추후 업데이트 예정)</p>
+                    </div>
+                </div>
+
+                <div class="official-desc-section">
+                    <h3><i class="ph ph-info"></i> 교육부 공식 설명</h3>
+                    <p id="modal-official-desc">기본적인 국어 능력 향상을 위한 필수 코스입니다.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
