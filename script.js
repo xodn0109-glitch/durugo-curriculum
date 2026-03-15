@@ -256,7 +256,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         block.innerHTML = `
             <div class="semester-title">
-                ${term === 0 ? `${grade}학년 전체 교육과정` : `${grade}학년 ${term}학기`}
+                <div><i class="ph ph-calendar-blank"></i> ${term === 0 ? `${grade}학년 전체 교육과정` : `${grade}학년 ${term}학기`}</div>
                 <span class="semester-credits">배정 과목 수: ${subjects.length}개</span>
             </div>
             ${sortedRules.map(ruleName => {
