@@ -276,6 +276,26 @@ body {
     filter: drop-shadow(0 2px 5px rgba(0,0,0,0.3));
 }
 
+.logo-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.logo-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--text-main);
+    line-height: 1.2;
+}
+
+.logo-subtitle {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 0.3px;
+}
+
 .badge {
     display: inline-block;
     padding: 8px 16px; /* Slightly bigger padding */
