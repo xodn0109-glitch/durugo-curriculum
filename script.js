@@ -96,7 +96,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Keep track of merged cells for Subject Group
             if (row[0] && row[0].trim() !== "") {
-                currentSubjectGroup = row[0].trim().replace(/\n/g, "");
+                let group = row[0].trim().replace(/\n/g, "");
+                if (group.includes("사회(역사/도덕 포함)")) {
+                    group = "사회";
+                }
+                currentSubjectGroup = group;
             }
 
             const subjectName = row[1] ? row[1].trim() : "";
