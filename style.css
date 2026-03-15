@@ -283,12 +283,13 @@ body {
 }
 
 .logo-title {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
     font-size: 1.15rem;
     font-weight: 800;
     color: var(--text-main);
     line-height: 1.2;
-    width: 100%;
-    text-align-last: justify; /* Justify text to match subtitle width */
 }
 
 .logo-subtitle {
