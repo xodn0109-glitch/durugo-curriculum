@@ -64,7 +64,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function fetchData(year) {
-        const csvUrl = CSV_URLS[year];
+        const csvUrl = typeof INTEGRATED_CURRICULUM_URL !== 'undefined' && INTEGRATED_CURRICULUM_URL.trim() !== '' 
+            ? INTEGRATED_CURRICULUM_URL 
+            : (typeof CSV_URLS !== 'undefined' ? CSV_URLS[year] : '');
         const commentsUrl = typeof COMMENTS_URL !== 'undefined' ? COMMENTS_URL : '';
 
         if (!csvUrl) {

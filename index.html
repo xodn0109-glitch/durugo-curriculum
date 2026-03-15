@@ -20,11 +20,10 @@
 
     <!-- Global Early Init Script -->
     <script>
-        const CSV_URLS = {
-            2025: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQow_gZ1AI0kCVtU-HIUZsRDQv9V--MQJKWCaK2aipsxF-F6cUTe7CER3aJXKrvuGbDa2pJF2miV85f/pub?output=csv',
-            2026: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9UZxKapkv2JQup-h7x2jvotGyzbql0UgZ-zcr9-IvaZFeRFR148bw3f3wYZyYOndmk8noxakhLIz1/pub?output=csv'
-        };
-        const COMMENTS_URL = ''; // 관련 교사 코멘트 및 과목 개요 구글 시트 CSV 링크 (게시 후 붙여넣기)
+        // [구글 시트 연동 주소]
+        // 구글 스프레드시트에서 [웹에 게시] 하신 후 나오는 .csv 주소를 각각 입력해 주세요!
+        const INTEGRATED_CURRICULUM_URL = ''; // 1️⃣ 통합 교육과정 편제표용 CSV 링크
+        const COMMENTS_URL = ''; // 2️⃣ 통합 과목 상세/코멘트용 CSV 링크
 
         function selectYear(year) {
             console.log("selectYear called early for:", year);
