@@ -470,13 +470,16 @@ h1 span {
 
 /* Track Cards */
 .track-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 24px;
     margin-bottom: 60px;
 }
 
 .track-card {
+    flex: 1 1 340px;
+    max-width: 380px;
     background: var(--bg-card);
     border: 1px solid var(--border-glass);
     border-radius: 20px;
