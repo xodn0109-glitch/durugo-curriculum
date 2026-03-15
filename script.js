@@ -77,6 +77,8 @@ document.addEventListener('DOMContentLoaded', () => {
         let currentSubjectGroup = "";
         let currentGradeSelectSemester = null; // Track semester for grade-selected groups
         let currentGradeSelectRule = ""; // Track selection rule for grade-selected groups
+        let currentGradeSelectGroupId = ""; // New: Group ID for selections
+        let gradeSelectGroupCounter = 0; // New: Increment counter on new rule block
 
         // Iterate starting from row 10 (data rows)
         for (let i = 7; i < rawData.length; i++) {
@@ -147,6 +149,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 if (rule) {
                     currentGradeSelectRule = rule;
+                    gradeSelectGroupCounter++;
+                    currentGradeSelectGroupId = `group_id_${gradeSelectGroupCounter}`;
                 }
 
                 // Individual credit from col 18 (편성)
@@ -158,6 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         name: subjectName,
                         type: type,
                         rule: currentGradeSelectRule || "선택",
+                        groupId: currentGradeSelectGroupId, // Added
                         credit: individualCredit,
                         grade: currentGradeSelectSemester.grade,
                         term: currentGradeSelectSemester.term,
@@ -235,16 +240,17 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Group subjects by their selection rule
         const ruleGroups = {};
-        // To keep "필수이수" at the top, we can use a specific key or sort later
         subjects.forEach(s => {
             let r = s.rule;
             if (!r) r = "기타";
             
-            // Normalize '필수' strings
             if (r.includes("필수")) r = "필수이수";
             
-            if (!ruleGroups[r]) ruleGroups[r] = [];
-            ruleGroups[r].push(s);
+            // Use groupId to avoid merging separate selection blocks using same name (e.g., 택3)
+            const groupKey = s.groupId || r;
+            
+            if (!ruleGroups[groupKey]) ruleGroups[groupKey] = [];
+            ruleGroups[groupKey].push(s);
         });
 
         // Sort rules so "필수이수" comes first
@@ -259,16 +265,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div><i class="ph ph-calendar-blank"></i> ${term === 0 ? `${grade}학년 전체 교육과정` : `${grade}학년 ${term}학기`}</div>
                 <span class="semester-credits">배정 과목 수: ${subjects.length}개</span>
             </div>
-            ${sortedRules.map(ruleName => {
-                const groupSubjects = ruleGroups[ruleName];
-                const isMandatory = ruleName === '필수이수';
+            ${sortedRules.map(groupKey => {
+                const groupSubjects = ruleGroups[groupKey];
+                const actualRuleName = groupSubjects[0].rule; // Get actual rule name from first subject
+                const isMandatory = actualRuleName === '필수이수';
                 
                 // Parse friendly rule names. e.g. "택1(2)" -> "1과목 선택 (2학점)"
-                let friendlyRuleName = ruleName;
-                const match = ruleName.match(/택(\d+)\((\d+)\)/);
+                let friendlyRuleName = actualRuleName;
+                const match = actualRuleName.match(/택(\d+)\((\d+)\)/);
                 if (match) {
                     friendlyRuleName = `${match[1]}과목 선택 (${match[2]}학점)`;
-                } else if (ruleName.includes('택1')) {
+                } else if (actualRuleName.includes('택1')) {
                      friendlyRuleName = '1과목 선택';
                 }
 
