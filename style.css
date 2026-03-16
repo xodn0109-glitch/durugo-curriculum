@@ -121,10 +121,9 @@
 .year-card-badge {
     font-size: 3.5rem;
     font-weight: 900;
-    background: linear-gradient(135deg, var(--primary-light), var(--secondary));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--primary);
+    background: none;
+    -webkit-text-fill-color: initial;
     margin-bottom: 8px;
     position: relative;
     z-index: 1;
