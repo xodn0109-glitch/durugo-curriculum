@@ -96,13 +96,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function processData(rawData, selectedYear) {
-        // Data format analysis based on the integrated CSV structure:
-        // Col 0: 입학년도
-        // Col 1: 교과군
-        // Col 2: 과목명
-        // ...
-        // Col 13: 1학년 1학기
-        // Col 14: 1학년 2학기
+        let isSheetFormat = false;
+
+        // 1. Detect format
+        if (rawData.length > 5 && rawData[4] && rawData[4][0] && rawData[4][0].trim() === "교과(군)") {
+            isSheetFormat = true;
+            console.log("Detected Google Sheet format dataset");
+        } else {
+            console.log("Detected Local CSV format dataset");
+        }
 
         const processed = [];
         let currentSubjectGroup = "";
@@ -111,31 +113,42 @@ document.addEventListener('DOMContentLoaded', () => {
         let currentGradeSelectGroupId = "";
         let gradeSelectGroupCounter = 0;
 
-        for (let i = 1; i < rawData.length; i++) {
+        // 2. Configuration based on format
+        const startIdx = isSheetFormat ? 7 : 1; 
+        const catCol = isSheetFormat ? 0 : 1;
+        const nameCol = isSheetFormat ? 1 : 2;
+        const creditColOffset = isSheetFormat ? 12 : 13; // start of semester cols
+
+        const semesters = [
+            { grade: 1, term: 1, col: creditColOffset },
+            { grade: 1, term: 2, col: creditColOffset + 1 },
+            { grade: 2, term: 1, col: creditColOffset + 2 },
+            { grade: 2, term: 2, col: creditColOffset + 3 },
+            { grade: 3, term: 1, col: creditColOffset + 4 },
+            { grade: 3, term: 2, col: creditColOffset + 5 }
+        ];
+
+        for (let i = startIdx; i < rawData.length; i++) {
             const row = rawData[i];
             if (!row || row.length < 3) continue;
 
-            const rowYear = row[0] ? row[0].trim() : "";
-            if (rowYear !== String(selectedYear)) continue; // Filter by selected year
-
-            if (!row[2] || row[2].trim() === "" || 
-                row[2] === "자율・자치 활동" || 
-                row[2] === "동아리 활동" || 
-                row[2] === "진로 활동" ||
-                (row[1] && row[1].includes("창의적\n 체험활동"))) {
-                continue; 
+            // Filter by Year (Skip for Sheet format if single sheet setup)
+            if (!isSheetFormat) {
+                const rowYear = row[0] ? row[0].trim() : "";
+                if (rowYear !== String(selectedYear)) continue; 
             }
 
-            if (row[1] && row[1].trim() !== "") {
-                let group = row[1].trim().replace(/\n/g, "");
-                if (group.includes("사회(역사/도덕 포함)")) {
-                    group = "사회";
-                }
+            if (row[catCol] && row[catCol].trim() !== "") {
+                let group = row[catCol].trim().replace(/\n/g, "");
+                if (group.includes("사회(역사/도덕 포함)")) group = "사회";
                 currentSubjectGroup = group;
             }
 
-            const subjectName = row[2] ? row[2].trim() : "";
-            if (!subjectName) continue;
+            const subjectName = row[nameCol] ? row[nameCol].trim() : "";
+            if (!subjectName || subjectName === "자율・자치 활동" || subjectName === "동아리 활동" || subjectName === "진로 활동" ||
+                (row[catCol] && row[catCol].includes("창의적\n 체험활동"))) {
+                continue; 
+            }
 
             let type = "일반";
             if (row[5] === "○") type = "공통";
@@ -144,17 +157,11 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (row[8] === "○") type = "융합선택";
             
             let rule = "";
-            if (row[10] && row[10].trim() !== "") rule = row[10].trim();
-            else if (row[11] && row[11].trim() !== "") rule = row[11].trim();
+            const ruleCol1 = isSheetFormat ? 11 : 10;
+            const ruleCol2 = isSheetFormat ? 11 : 11; // If sheet only has 1 col
 
-            const semesters = [
-                { grade: 1, term: 1, col: 13 },
-                { grade: 1, term: 2, col: 14 },
-                { grade: 2, term: 1, col: 15 },
-                { grade: 2, term: 2, col: 16 },
-                { grade: 3, term: 1, col: 17 },
-                { grade: 3, term: 2, col: 18 }
-            ];
+            if (row[ruleCol1] && row[ruleCol1].trim() !== "") rule = row[ruleCol1].trim();
+            else if (row[ruleCol2] && row[ruleCol2].trim() !== "") rule = row[ruleCol2].trim();
 
             const isGradeSelect = row[4] === "○"; 
 
@@ -176,7 +183,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     currentGradeSelectGroupId = `group_id_${gradeSelectGroupCounter}`;
                 }
 
-                const individualCredit = row[19] ? row[19].trim().replace(/[^0-9]/g, '') : "";
+                // Individual credits placement usually offset by end of semesters or specific col.
+                // In local it gets from index 19.
+                const creditCol = isSheetFormat ? 18 : 19; 
+                const individualCredit = row[creditCol] ? row[creditCol].trim().replace(/[^0-9]/g, '') : "";
 
                 if (currentGradeSelectSemester && individualCredit) {
                     processed.push({
