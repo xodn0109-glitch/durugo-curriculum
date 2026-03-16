@@ -179,7 +179,11 @@ document.addEventListener('DOMContentLoaded', () => {
             let rule = "";
             if (isNewFormat) {
                 const rowRule = row[4] ? row[4].trim() : "";
-                if (rowRule !== "") currentNewFormatRule = rowRule;
+                if (rowRule !== "") {
+                    currentNewFormatRule = rowRule;
+                    gradeSelectGroupCounter++;
+                    currentGradeSelectGroupId = `group_id_new_${gradeSelectGroupCounter}`;
+                }
                 rule = currentNewFormatRule;
             } else {
                 const ruleCol1 = isSheetFormat ? 11 : 10;
@@ -239,6 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             credit: finalCredit,
                             grade: sem.grade,
                             term: sem.term,
+                            groupId: isNewFormat ? currentGradeSelectGroupId : "",
                             rawDetails: row
                         });
                     }
