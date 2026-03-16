@@ -116,6 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let currentGradeSelectRule = "";
         let currentGradeSelectGroupId = "";
         let gradeSelectGroupCounter = 0;
+        let currentNewFormatRule = ""; // Support cell merged carries for New layout
 
         // 2. Adjust offsets based on format
         let startIdx = 1;
@@ -177,7 +178,9 @@ document.addEventListener('DOMContentLoaded', () => {
             
             let rule = "";
             if (isNewFormat) {
-                rule = row[4] ? row[4].trim() : "";
+                const rowRule = row[4] ? row[4].trim() : "";
+                if (rowRule !== "") currentNewFormatRule = rowRule;
+                rule = currentNewFormatRule;
             } else {
                 const ruleCol1 = isSheetFormat ? 11 : 10;
                 if (row[ruleCol1] && row[ruleCol1].trim() !== "") rule = row[ruleCol1].trim();
