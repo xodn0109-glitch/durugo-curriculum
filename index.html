@@ -22,7 +22,8 @@
     <script>
         // [구글 시트 연동 주소]
         // 구글 스프레드시트에서 [웹에 게시] 하신 후 나오는 .csv 주소를 각각 입력해 주세요!
-        const INTEGRATED_CURRICULUM_URL = '교육과정_편제표_통합.csv'; // 1️⃣ 통합 교육과정 편제표용 CSV 링크
+        const INTEGRATED_CURRICULUM_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSqlR_0VZUgDDpq-Q1u30oMzP4LZPoAI06rrXYGUFjv4BtH2QaUJwGFubyyvgfiw76_BkOmRlF0VjII/pub?output=csv'; // 1️⃣ 구글 시트 연동 (최종 양식)
+        // const INTEGRATED_CURRICULUM_URL = '교육과정_편제표_통합.csv'; // 📌 로컬 백업용 (연동 해제 시 주석 해제)
         const COMMENTS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTgWMFZrK41XvB58mA3uz-T6Hu026ak_QrZqXgoXmeDJSa1c6VNTFtnyOXbYREXt5bOtksV83nS8uSZ/pub?output=csv'; // 2️⃣ 통합 과목 상세/코멘트용 CSV 링크
 
         function selectYear(year) {

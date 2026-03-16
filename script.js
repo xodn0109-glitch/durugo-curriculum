@@ -96,13 +96,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function processData(rawData, selectedYear) {
-        // Data format analysis based on the integrated CSV structure:
-        // Col 0: 입학년도
-        // Col 1: 교과군
-        // Col 2: 과목명
-        // ...
-        // Col 13: 1학년 1학기
-        // Col 14: 1학년 2학기
+        let isSheetFormat = false; // Old Google Sheet index offset format
+        let isNewFormat = false;   // New Simplified Sheet (12 cols)
+
+        // 1. Detect format
+        if (rawData.length > 0 && rawData[0] && rawData[0][5] && rawData[0][5].trim() === "학점") {
+            isNewFormat = true;
+            console.log("Detected Simplified New Format dataset");
+        } else if (rawData.length > 5 && rawData[4] && rawData[4][0] && rawData[4][0].trim() === "교과(군)") {
+            isSheetFormat = true;
+            console.log("Detected Google Sheet index offset format");
+        } else {
+            console.log("Detected Local CSV format dataset");
+        }
 
         const processed = [];
         let currentSubjectGroup = "";
@@ -111,52 +117,74 @@ document.addEventListener('DOMContentLoaded', () => {
         let currentGradeSelectGroupId = "";
         let gradeSelectGroupCounter = 0;
 
-        for (let i = 1; i < rawData.length; i++) {
+        // 2. Adjust offsets based on format
+        let startIdx = 1;
+        let catCol = 1;
+        let nameCol = 2;
+        let creditColOffset = 13;
+
+        if (isNewFormat) {
+            startIdx = 1;
+            catCol = 1;
+            nameCol = 2;
+            creditColOffset = 6;
+        } else if (isSheetFormat) {
+            startIdx = 7;
+            catCol = 0;
+            nameCol = 1;
+            creditColOffset = 12;
+        }
+
+        const semesters = [
+            { grade: 1, term: 1, col: creditColOffset },
+            { grade: 1, term: 2, col: creditColOffset + 1 },
+            { grade: 2, term: 1, col: creditColOffset + 2 },
+            { grade: 2, term: 2, col: creditColOffset + 3 },
+            { grade: 3, term: 1, col: creditColOffset + 4 },
+            { grade: 3, term: 2, col: creditColOffset + 5 }
+        ];
+
+        for (let i = startIdx; i < rawData.length; i++) {
             const row = rawData[i];
             if (!row || row.length < 3) continue;
 
-            const rowYear = row[0] ? row[0].trim() : "";
-            if (rowYear !== String(selectedYear)) continue; // Filter by selected year
-
-            if (!row[2] || row[2].trim() === "" || 
-                row[2] === "자율・자치 활동" || 
-                row[2] === "동아리 활동" || 
-                row[2] === "진로 활동" ||
-                (row[1] && row[1].includes("창의적\n 체험활동"))) {
-                continue; 
+            if (!isSheetFormat) {
+                const rowYear = row[0] ? row[0].trim() : "";
+                if (rowYear !== String(selectedYear)) continue; 
             }
 
-            if (row[1] && row[1].trim() !== "") {
-                let group = row[1].trim().replace(/\n/g, "");
-                if (group.includes("사회(역사/도덕 포함)")) {
-                    group = "사회";
-                }
+            if (row[catCol] && row[catCol].trim() !== "") {
+                let group = row[catCol].trim().replace(/\n/g, "");
+                if (group.includes("사회(역사/도덕 포함)")) group = "사회";
                 currentSubjectGroup = group;
             }
 
-            const subjectName = row[2] ? row[2].trim() : "";
-            if (!subjectName) continue;
+            const subjectName = row[nameCol] ? row[nameCol].trim() : "";
+            if (!subjectName || subjectName === "자율・자치 활동" || subjectName === "동아리 활동" || subjectName === "진로 활동" ||
+                (row[catCol] && row[catCol].includes("창의적\n 체험활동"))) {
+                continue; 
+            }
 
             let type = "일반";
-            if (row[5] === "○") type = "공통";
-            else if (row[6] === "○") type = "일반선택";
-            else if (row[7] === "○") type = "진로선택";
-            else if (row[8] === "○") type = "융합선택";
+            if (isNewFormat) {
+                type = row[3] ? row[3].trim() : "일반";
+            } else {
+                if (row[5] === "○") type = "공통";
+                else if (row[6] === "○") type = "일반선택";
+                else if (row[7] === "○") type = "진로선택";
+                else if (row[8] === "○") type = "융합선택";
+            }
             
             let rule = "";
-            if (row[10] && row[10].trim() !== "") rule = row[10].trim();
-            else if (row[11] && row[11].trim() !== "") rule = row[11].trim();
+            if (isNewFormat) {
+                rule = row[4] ? row[4].trim() : "";
+            } else {
+                const ruleCol1 = isSheetFormat ? 11 : 10;
+                if (row[ruleCol1] && row[ruleCol1].trim() !== "") rule = row[ruleCol1].trim();
+                else if (row[11] && row[11].trim() !== "") rule = row[11].trim();
+            }
 
-            const semesters = [
-                { grade: 1, term: 1, col: 13 },
-                { grade: 1, term: 2, col: 14 },
-                { grade: 2, term: 1, col: 15 },
-                { grade: 2, term: 2, col: 16 },
-                { grade: 3, term: 1, col: 17 },
-                { grade: 3, term: 2, col: 18 }
-            ];
-
-            const isGradeSelect = row[4] === "○"; 
+            const isGradeSelect = !isNewFormat && row[4] === "○"; 
 
             if (isGradeSelect) {
                 let foundSemester = null;
@@ -195,12 +223,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 semesters.forEach(sem => {
                     const cellValue = row[sem.col] ? row[sem.col].trim() : "";
                     if (cellValue !== "") {
+                        let finalCredit = cellValue.replace(/[^0-9]/g, '');
+                        if (isNewFormat && (cellValue === "○" || cellValue === "o")) {
+                            finalCredit = row[5] ? row[5].trim().replace(/[^0-9]/g, '') : "";
+                        }
+                        
                         processed.push({
                             category: currentSubjectGroup,
                             name: subjectName,
                             type: type,
-                            rule: rule !== "" ? rule : (cellValue.includes("택") ? cellValue : "필수이수"),
-                            credit: cellValue.replace(/[^0-9]/g, ''),
+                            rule: isNewFormat ? (rule !== "" ? rule : "필수이수") : (rule !== "" ? rule : (cellValue.includes("택") ? cellValue : "필수이수")),
+                            credit: finalCredit,
                             grade: sem.grade,
                             term: sem.term,
                             rawDetails: row
