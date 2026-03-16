@@ -347,7 +347,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 return `
                 <div class="rule-group ${isMandatory ? 'mandatory' : 'elective'}">
-                    <div class="${titleClass}">${titleIcon} ${displayTitle} <span class="rule-count">(${groupSubjects.length}과목 중)</span></div>
+                    <div class="${titleClass}">${titleIcon} ${displayTitle} <span class="rule-count">(${groupSubjects.length}과목${isMandatory ? '' : ' 중'})</span></div>
                     <div class="subject-grid">
                         ${groupSubjects.map(s => {
                             // 1학년 교차이수 과목 시각적 표시 처리
