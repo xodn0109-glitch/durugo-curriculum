@@ -302,6 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Group subjects by their selection rule
         const ruleGroups = {};
+        const groupOrder = [];
         subjects.forEach(s => {
             let r = s.rule;
             if (!r) r = "기타";
@@ -311,16 +312,19 @@ document.addEventListener('DOMContentLoaded', () => {
             // Use groupId to avoid merging separate selection blocks using same name (e.g., 택3)
             const groupKey = s.groupId || r;
             
-            if (!ruleGroups[groupKey]) ruleGroups[groupKey] = [];
+            if (!ruleGroups[groupKey]) {
+                ruleGroups[groupKey] = [];
+                if (groupKey !== "필수이수") {
+                    groupOrder.push(groupKey);
+                }
+            }
             ruleGroups[groupKey].push(s);
         });
 
-        // Sort rules so "필수이수" comes first
-        const sortedRules = Object.keys(ruleGroups).sort((a, b) => {
-            if (a === "필수이수") return -1;
-            if (b === "필수이수") return 1;
-            return a.localeCompare(b);
-        });
+        // Sort rules so "필수이수" comes first, and the rest keep their original CSV order
+        const sortedRules = [];
+        if (ruleGroups["필수이수"]) sortedRules.push("필수이수");
+        sortedRules.push(...groupOrder);
 
         block.innerHTML = `
             <div class="semester-title">
