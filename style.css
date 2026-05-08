@@ -175,20 +175,27 @@
 
 .banner-text {
     display: flex;
-    flex-direction: column;
-    text-align: left;
+    align-items: center;
 }
 
 .banner-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     font-weight: 800;
-    font-size: 1.15rem;
+    font-size: 1.25rem;
     color: var(--text-main);
+    transition: color 0.3s ease;
 }
 
-.banner-desc {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    margin-top: 2px;
+.banner-title i {
+    font-size: 1.3rem;
+    color: var(--primary);
+    transition: transform 0.3s ease;
+}
+
+.recommend-banner:hover .banner-title i {
+    transform: translateX(4px);
 }
 
 /* App main transition */
