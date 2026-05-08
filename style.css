@@ -145,6 +145,52 @@
     z-index: 1;
 }
 
+/* Recommend Banner */
+.recommend-banner {
+    display: inline-flex;
+    align-items: center;
+    gap: 15px;
+    margin-top: 40px;
+    padding: 16px 30px;
+    background: linear-gradient(135deg, rgba(56, 81, 255, 0.05), rgba(255, 51, 102, 0.05));
+    border: 1px solid rgba(56, 81, 255, 0.2);
+    border-radius: 20px;
+    text-decoration: none;
+    color: var(--text-main);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.recommend-banner:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(56, 81, 255, 0.15);
+    border-color: rgba(56, 81, 255, 0.4);
+    background: linear-gradient(135deg, rgba(56, 81, 255, 0.1), rgba(255, 51, 102, 0.1));
+}
+
+.recommend-banner i {
+    font-size: 2.2rem;
+    color: var(--primary);
+}
+
+.banner-text {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.banner-title {
+    font-weight: 800;
+    font-size: 1.15rem;
+    color: var(--text-main);
+}
+
+.banner-desc {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
 /* App main transition */
 #app-main {
     transition: opacity 0.5s ease;
