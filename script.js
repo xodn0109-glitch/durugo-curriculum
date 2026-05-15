@@ -56,7 +56,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (name) {
                 window.subjectDetailsDB[name] = {
                     overview: row[2] ? row[2].trim() : "",
-                    teacher: row[3] ? row[3].trim() : ""
+                    content: row[3] ? row[3].trim() : "",
+                    teacher: row[4] ? row[4].trim() : ""
                 };
             }
         }
@@ -422,9 +423,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const details = window.subjectDetailsDB ? window.subjectDetailsDB[subjectInfo.name] : null;
         if (details) {
             document.getElementById('modal-official-desc').innerText = details.overview || "과목 개요 정보가 없습니다.";
+            document.getElementById('modal-main-content').innerText = details.content || "주요 내용 정보가 없습니다.";
             document.getElementById('modal-teacher-comment').innerText = details.teacher || "담당 교사 코멘트가 없습니다.";
         } else {
             // Fallback placeholder/defaults
+            document.getElementById('modal-main-content').innerText = "과목의 주요 내용이 표시될 예정입니다.";
             document.getElementById('modal-teacher-comment').innerHTML = `
                 ${subjectInfo.name} 과목에 대한 담당 선생님의 코멘트가 보여질 영역입니다.<br>
                 <span style="color:var(--text-muted); font-size:0.85em;">(현재 연동 대기 중 - 별도 배포되는 교사 입력 시트에서 가져올 예정)</span>
