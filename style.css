@@ -962,20 +962,23 @@ h1 span {
 }
 
 .teacher-comment-section {
-    margin-top: 25px;
-    margin-bottom: 30px;
+    margin-bottom: 25px;
+}
+
+.official-desc-section {
+    margin-bottom: 25px;
+}
+
+.main-content-section {
+    margin-bottom: 0;
 }
 
 .teacher-comment-section h3, .official-desc-section h3, .main-content-section h3 {
     font-size: 1.1rem;
-    margin-bottom: 6px;
+    margin-bottom: 10px;
     display: flex;
     align-items: center;
     gap: 8px;
-}
-
-.official-desc-section h3, .main-content-section h3 {
-    margin-bottom: 2px;
 }
 
 .teacher-comment-section h3 i { color: #ffd166; }
