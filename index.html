@@ -44,6 +44,19 @@
             window._selectedYear = year;
             window.dispatchEvent(new CustomEvent('yearSelected', { detail: year }));
         }
+
+        function goBackToHome() {
+            console.log("goBackToHome called");
+            const yearSel = document.getElementById('year-selection');
+            const appMain = document.getElementById('app-main');
+            
+            if (yearSel) yearSel.classList.remove('hidden');
+            if (appMain) appMain.classList.add('hidden');
+            
+            // Reset state
+            document.title = "두루고등학교 고교학점제 이수 가이드북";
+            window._selectedYear = null;
+        }
     </script>
 </head>
 <body>
@@ -84,15 +97,16 @@
         <!-- Header Section -->
         <header class="hero-section">
             <div class="hero-content">
-                <div class="hero-top-badges fade-in">
-                    <img src="logo.png" alt="두루고등학교 로고" class="school-logo">
-                    <div class="logo-text">
-                        <div class="logo-title"><span>두</span><span>루</span><span>고</span><span>등</span><span>학</span><span>교</span></div>
-                        <div class="logo-subtitle">DURU HIGH SCHOOL</div>
+                <div class="brand-link" onclick="goBackToHome()" title="홈 화면으로 이동">
+                    <div class="hero-top-badges fade-in">
+                        <img src="logo.png" alt="두루고등학교 로고" class="school-logo">
+                        <div class="logo-text">
+                            <div class="logo-title"><span>두</span><span>루</span><span>고</span><span>등</span><span>학</span><span>교</span></div>
+                            <div class="logo-subtitle">DURU HIGH SCHOOL</div>
+                        </div>
                     </div>
-
+                    <h1 class="fade-in"><span id="hero-year">2026</span>학년도 입학생<br><span>고교학점제</span> 이수 가이드북</h1>
                 </div>
-                <h1 class="fade-in"><span id="hero-year">2026</span>학년도 입학생<br><span>고교학점제</span> 이수 가이드북</h1>
                 
                 <div class="principal-box fade-in">
                     <div class="floating-principal-btn" id="principal-trigger">

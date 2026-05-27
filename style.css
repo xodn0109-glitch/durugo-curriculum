@@ -319,6 +319,23 @@ body {
 }
 
 /* Hero Section */
+.brand-link {
+    display: inline-block;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 12px;
+}
+
+.brand-link:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+
+.brand-link:active {
+    transform: translateY(0) scale(0.98);
+}
+
 .hero-section {
     display: flex;
     justify-content: space-between;
