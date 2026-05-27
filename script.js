@@ -419,6 +419,16 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('modal-credits').innerText = subjectInfo.credit ? `${subjectInfo.credit} 단위(학점)` : '정보 없음';
         document.getElementById('modal-type').innerText = subjectInfo.type + (subjectInfo.rule !== '필수이수' ? ` (${subjectInfo.rule})` : '');
         
+        // Show or hide teacher comment section for mandatory subjects
+        const commentSection = document.getElementById('modal-teacher-comment-section');
+        if (commentSection) {
+            if (subjectInfo.rule === '필수이수') {
+                commentSection.style.display = 'none';
+            } else {
+                commentSection.style.display = 'block';
+            }
+        }
+
         // Fetch description data from sub-sheet cache if it exists
         const details = window.subjectDetailsDB ? window.subjectDetailsDB[subjectInfo.name] : null;
         if (details) {
