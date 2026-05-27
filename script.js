@@ -413,6 +413,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // ---- MODAL CONTROLS ----
     // Make openModal global so inline onclick works
     window.openModal = function(subjectInfo) {
+        // Reset scroll position of modal content to the top
+        const modalContent = modal.querySelector('.modal-content');
+        if (modalContent) {
+            modalContent.scrollTop = 0;
+        }
+
         document.getElementById('modal-title').innerText = subjectInfo.name;
         document.getElementById('modal-category').innerText = subjectInfo.category;
         document.getElementById('modal-semester').innerText = `${subjectInfo.grade}학년 ${subjectInfo.term}학기`;
