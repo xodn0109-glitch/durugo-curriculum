@@ -159,11 +159,19 @@
 }
 
 /* Recommend Banner */
+.recommend-banners-container {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 45px;
+    width: 100%;
+}
+
 .recommend-banner {
     display: inline-flex;
     align-items: center;
     gap: 15px;
-    margin-top: 40px;
     padding: 16px 30px;
     background: linear-gradient(135deg, rgba(56, 81, 255, 0.05), rgba(255, 51, 102, 0.05));
     border: 1px solid rgba(56, 81, 255, 0.2);
